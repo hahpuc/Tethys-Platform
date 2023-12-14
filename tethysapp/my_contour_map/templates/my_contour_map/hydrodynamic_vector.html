@@ -1,0 +1,34 @@
+{% extends "my_contour_map/base.html" %}
+
+{% load tethys_gizmos %}
+
+{% block app_content %}
+
+<h1>Vector Hydrodynamic</h1>
+
+<form id="load-data-form" method="post">
+    {% csrf_token %}
+    <!-- <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01">Date</label>
+        </div>
+        <select class="custom-select" id="inputGroupSelect01">
+            <option selected>Choose...</option>
+
+            {% for date in dates_input %}
+            <option value="{{ date }}">{{ date }}</option>
+            {% endfor %}
+
+        </select>
+    </div> -->
+
+    {% gizmo dates_input %}
+</form>
+
+<img class="map-view" src="/static/my_contour_map/images/vector.png" alt="Vector View" style="width: 100%;">
+
+{% endblock %}
+
+{% block app_actions %}
+{% gizmo visualize_button %}
+{% endblock %}

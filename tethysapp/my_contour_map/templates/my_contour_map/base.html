@@ -1,0 +1,48 @@
+{% extends "tethys_apps/app_base.html" %}
+
+{% load static %}
+
+{% block title %}{{ tethys_app.name }}{% endblock %}
+
+{% block app_icon %}
+{# The path you provided in your app.py is accessible through the tethys_app.icon context variable #}
+<img src="{% if 'http' in tethys_app.icon %}{{ tethys_app.icon }}{% else %}{% static tethys_app.icon %}{% endif %}" />
+{% endblock %}
+
+{# The name you provided in your app.py is accessible through the tethys_app.name context variable #}
+{% block app_title %}{{ tethys_app.name }}{% endblock %}
+
+{% block app_navigation_items %}
+{% url 'my_contour_map:home' as home_url %}
+{% url 'my_contour_map:contour_view' as contour_view_url %}
+{% url 'my_contour_map:hydrodynamic_vector_view' as hydrodynamic_vector_url %}
+
+
+<li class="nav-item title">App Navigation</li>
+<li class="nav-item"><a class="nav-link {% if request.path == home_url %} active {% endif %}"
+    href="{{home_url}}">Home</a></li>
+<li class="nav-item subtitle"><a class="nav-link {% if request.path == contour_view_url %} active {% endif %}"
+    href="{{contour_view_url}}">Contour Map</a></li>
+<li class="nav-item subtitle"><a class="nav-link {% if request.path == hydrodynamic_vector_url %} active {% endif %}"
+    href="{{hydrodynamic_vector_url}}">Hydrodynamic Vector</a></li>
+{% endblock %}
+
+{% block app_content %}
+{% endblock %}
+
+{% block app_actions %}
+{% endblock %}
+
+{% block content_dependent_styles %}
+{{ block.super }}
+<link href="{% static 'my_contour_map/css/main.css' %}" rel="stylesheet" />
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'my_contour_map/js/main.js' %}" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+{% endblock %}
