@@ -1,3 +1,4 @@
+from datetime import date
 from django.shortcuts import render
 from tethys_sdk.routing import controller
 from tethys_sdk.gizmos import Button
@@ -85,66 +86,41 @@ def home(request):
 
 @controller(url='my-contour-map/contour-view')
 def contour_view(request):
-    fig = pygmt.Figure()
-
-    # HARD CODE VIETNAM REGION
-    region = [102, 110.1, 8, 17.8]
-
-    ## SET UP lat, long variables
-    lat_min, lat_max = 8, 17.8
-    lon_min, lon_max = 102, 110.1
-
-    lat = np.arange(lat_min, lat_max, 0.2)
-    lon = np.arange(lon_min, lon_max, 0.2)
-
-    # Load Data File
-    file_data = "tethysapp/my_contour_map/public/data_sample/data.d"
-    with open(file_data, "r") as file:
-        dataFile = [[float(num) for num in line.split()] for line in file]
-
-    data = np.array(dataFile)
-    # data = np.random.uniform(-5, 5, size=(len(lat), len(lon)))
-
-    grid = xr.DataArray(
-        data=data,
-        dims=["lat", "lon"],
-        coords={
-            "lon": lon,
-            "lat": lat,
-        },
+    
+    image_path = ""
+    
+    if (request.POST and 'visualize-button' in request.POST):
+        dates_input = request.POST.get('dates-input')
+        
+        print('Visualize Salinity Data for: ', dates_input)
+        
+        DrawVectorService.draw_contour(dates_input)
+        
+        image_path = "contour_map_" + dates_input + ".png"
+        
+    
+    dates_input = SelectInput(
+        display_text='Dates',
+        name='dates-input',
+        multiple=False,
+        options=[(date, date) for date in ['201001021300', '201001021500', '201001022000', '201001022400',  '201001030300']],
+        error=None,
     )
     
-    print(grid)
-
-    ## SHOW DATA Contour
-    fig.grdimage(
-        grid=grid,
-        cmap="viridis",
-        projection="M12c",
-    )
-    fig.grdcontour(
-        interval=250,
-        grid=grid,
-        limit=[-4000, -2000],
-    )
-
-    ## Show map line
-    fig.coast(
-        region=region,
-        projection="M12c",
-        borders="1/0.5p",
-        shorelines="1/0.5p",
-        frame="ag",
-    )
-
-    # Set color bar bottom
-    fig.colorbar(frame=["x+lContour DATA", "y+lm"])
     
-    image_path = "tethysapp/my_contour_map/public/images/contour_map.png"
-    
-    fig.savefig(image_path, dpi=300, show=False)
+    visualize_button = Button(
+        display_text='Visualize',
+        name='visualize-button',
+        style='success',
+        submit=True,
+        attributes={
+            'form': 'load-data-form'
+        }
+    )
     
     context = {
+        'dates_input': dates_input,
+        'visualize_button': visualize_button,
         "image_path": image_path
     }
     
@@ -159,9 +135,12 @@ def hydrodynamic_vector_view(request):
     if (request.POST and 'visualize-button' in request.POST):
         dates_input = request.POST.get('dates-input')
         
-        print('Visualize Data for: ', dates_input)
+        print('Visualize Vector Data for: ', dates_input)
         
-        result_path = DrawVectorService.draw_vector(dates_input)
+        DrawVectorService.draw_vector(dates_input)
+        
+        result_path = "vector_" + dates_input + ".png"
+        
     
     dates_input = SelectInput(
         display_text='Dates',
